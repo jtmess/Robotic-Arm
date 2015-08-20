@@ -1,0 +1,409 @@
+/* Robotic Arm Control Program
+   Jake Messner
+   January 2013 */
+
+#include <Servo.h>
+
+Servo servo1;
+int servo1pos = 0;
+Servo servo2;
+int servo2pos = 0;
+Servo servo3;
+const int magnet = 13;
+const int light = 8;
+const int magnetSwitch = 5;
+const int gripperSwitch = 6;
+const int continueSwitch = 7;
+const int joyx = 1;
+const int joyy = 0;
+//int target1 = 0;
+//int target2 = 0;
+int magnetSwitchState = 0;
+int gripperSwitchState = 0;
+int magnetSwitchStateNow = 0;
+int gripperSwitchStateNow = 0;
+int continueSwitchState = 0;
+int alreadyrunning = 0;
+int servoVal;
+int servoValNow;
+int servoVal2;
+int servoVal2Now;
+int lastmagnet = 0;
+int lastgripper = 0;
+int firstmanual = 1;
+
+void setup() {
+  servo1.attach(1);
+    servo2.attach(2);
+    servo3.attach(3);
+    pinMode(magnet, OUTPUT);
+    pinMode(light, OUTPUT);
+    pinMode(magnetSwitch, INPUT);
+    pinMode(gripperSwitch, INPUT);
+    pinMode(continueSwitch, INPUT);
+    Serial.begin(9600);
+}
+void loop() {
+  
+  outputServos();
+  
+  continueSwitchState = digitalRead(continueSwitch);
+   while (digitalRead(7) == 0) {
+
+       outputServos();
+       delay(30);           //  debounce
+   }
+//    magnetSwitchState = digitalRead(magnetSwitch);
+//    gripperSwitchState = digitalRead(gripperSwitch);
+ 
+   if (alreadyrunning == 1) {
+     
+   }
+   else if (alreadyrunning == 0) {
+     
+     if(gripperSwitchState == 0) {
+
+       automaticL();
+   
+     }
+     else if (gripperSwitchState == 1) {
+       
+       automaticR();
+   }
+          
+ }
+    
+ delay(30);
+}
+
+void automaticL() {
+  Serial.println("automatic running");
+  alreadyrunning = 1;
+
+     Serial.println("bonus left");
+      Serial.println("step 1");
+              servo3.write(180); //OPEN
+      servo2.write(90);                //step 1
+      delay(2000);
+      servo1.write(85);
+      delay(1000);
+      delay(1000);
+      servo2.write(30);
+      delay(2000);
+      servo3.write(0);   //CLOSE
+      delay(1000);
+      servo2.write(90);
+      delay(2000); 
+      servo1.write(100);
+      delay(1500);
+      servo2.write(50);
+      delay(2000); 
+      servo3.write(180);   //OPEN
+      delay(1000);
+      lastmagnet = 0;
+      lastgripper = 1;
+      servoValNow = servo1.read();
+      servoVal2Now = servo2.read(); 
+      magnetSwitchStateNow = digitalRead(magnetSwitch);
+      gripperSwitchStateNow = digitalRead(gripperSwitch); 
+      digitalWrite(light, 1);
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce
+      }
+      Serial.println("step 1 finished");
+      digitalWrite(light, 0);
+      servo3.write(180);
+      servo2.write(90);
+      delay(2000);
+      servo1.write(100);
+      delay(650);
+      servo2.write(30);
+      delay(1000);
+      servo3.write(0);
+      delay(1000);
+      servo2.write(90);
+      delay(1000);
+      servo1.write(50);
+      delay(900);
+      servo2.write(55);
+      delay(1000);
+      servo3.write(180);
+      delay(1000);
+      lastmagnet = 0;
+      lastgripper = 1;
+      servoValNow = servo1.read();
+      servoVal2Now = servo2.read(); 
+      magnetSwitchStateNow = digitalRead(magnetSwitch);
+      gripperSwitchStateNow = digitalRead(gripperSwitch);    
+      digitalWrite(light, 1);
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce
+      }
+      Serial.println("step 2 finished");
+      digitalWrite(light, 0);
+      servo3.write(180);
+      servo2.write(90);
+      delay(1000);
+      servo1.write(135);
+      delay(850);
+      servo2.write(30);
+      delay(1000);
+      servo3.write(0);
+      delay(1000);
+      servo2.write(90);
+      servo1.write(75);
+      delay(1000);
+      servo2.write(60);
+      delay(1000);
+      servo3.write(180);
+      delay(1000);
+      servoValNow = servo1.read();     
+      servoVal2Now = servo2.read();               
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce  
+      }
+      Serial.println("step 3 finished"); 
+  
+}
+
+void automaticR() {
+  
+    Serial.println("automatic running");
+  alreadyrunning = 1;
+
+     Serial.println("bonus right");
+      Serial.println("step 1");
+              servo3.write(180); //OPEN
+      servo2.write(90);                //step 1
+      delay(2000);
+      servo1.write(85);
+      delay(1000);
+      delay(1000);
+      servo2.write(30);
+      delay(2000);
+      servo3.write(0);   //CLOSE
+      delay(1000);
+      servo2.write(90);
+      delay(2000); 
+      servo1.write(100);
+      delay(1500);
+      servo2.write(50);
+      delay(2000); 
+      servo3.write(180);   //OPEN
+      delay(1000);
+      firstmanual = 1;
+      lastmagnet = 0;
+      lastgripper = 1;
+      servoValNow = servo1.read();
+      servoVal2Now = servo2.read();     
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce
+      }
+      Serial.println("step 1 finished");
+      servo3.write(180);
+      servo2.write(90);
+      delay(2000);
+      servo1.write(100);
+      delay(650);
+      servo2.write(30);
+      delay(1000);
+      servo3.write(0);
+      delay(1000);
+      servo2.write(90);
+      delay(1000);
+      servo1.write(50);
+      delay(900);
+      servo2.write(55);
+      delay(1000);
+      servo3.write(180);
+      delay(1000);
+      servoValNow = analogRead(joyx);     
+      servoVal2Now = analogRead(joyy);               
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce
+      }
+      Serial.println("step 2 finished");
+      servo3.write(180);
+      servo2.write(90);
+      delay(1000);
+      servo1.write(135);
+      delay(850);
+      servo2.write(30);
+      delay(1000);
+      servo3.write(0);
+      delay(1000);
+      servo2.write(90);
+      servo1.write(75);
+      delay(1000);
+      servo2.write(60);
+      delay(1000);
+      servo3.write(180);
+      delay(1000);
+      servoValNow = analogRead(joyx);     
+      servoVal2Now = analogRead(joyy);               
+      while (digitalRead(7) == 0) {
+        manual();  
+        delay(30);           //  debounce  
+      }
+      Serial.println("step 3 finished"); 
+      
+}
+  
+  
+
+void manual() {
+  
+  outputServos();
+                                     //MANUAL CONTROL SECTION
+    // Read the horizontal joystick value  (value between 0 and 1023)
+    servoVal = analogRead(joyx);          
+    servoVal = map(servoVal, 0, 1023, -60, 60);     // scale it to use it with the servo (result  between 0 and 180)
+    
+    if(servoVal < -5) {
+    
+    servo1.write(servoValNow - 1);                         // sets the servo position according to the scaled value   
+    }
+    else if(servoVal > 5) {
+      
+    servo1.write(servoValNow + 1); 
+    }
+    // Read the horizontal joystick value  (value between 0 and 1023)
+    servoVal2 = analogRead(joyy);           
+    servoVal2 = map(servoVal2, 0, 1023, -60, 60);     // scale it to use it with the servo (result between 70 and 180)
+    
+    if(servoVal2 < -5) {
+    
+    servo2.write(servoVal2Now - 1);                         // sets the servo position according to the scaled value   
+    }
+    else if(servoVal2 > 5) {
+      
+    servo2.write(servoVal2Now + 1); 
+    }                        // sets the servo position according to the scaled value
+    
+    runmagnet();
+    
+    rungripper();
+    
+    servoValNow = servo1.read();
+    servoVal2Now = servo2.read();
+    
+    delay(30);        //(originally 50)                           // waits for the servo to get there
+}
+
+void runmagnet() {
+  
+  magnetSwitchState = digitalRead(magnetSwitch);
+  
+  if((lastmagnet == 0) && (magnetSwitchStateNow != magnetSwitchState)) {
+    
+         digitalWrite(magnet, 1);
+     Serial.println("magnetized 1");
+     lastmagnet = 1;
+       magnetSwitchStateNow = digitalRead(magnetSwitch);
+
+  }
+  else if((lastmagnet == 0) && (magnetSwitchStateNow == magnetSwitchState)) {
+    
+         digitalWrite(magnet, 0);
+     Serial.println("NOT magnetized 1");
+     lastmagnet = 0;
+       magnetSwitchStateNow = digitalRead(magnetSwitch);
+
+  }
+  else if((lastmagnet == 1) && (magnetSwitchStateNow != magnetSwitchState)) {
+    
+         digitalWrite(magnet, 0);
+     Serial.println("NOT magnetized 2");
+     lastmagnet = 0;
+       magnetSwitchStateNow = digitalRead(magnetSwitch);
+
+  }
+  else if((lastmagnet == 1) && (magnetSwitchStateNow == magnetSwitchState)) {
+    
+         digitalWrite(magnet, 1);
+     Serial.println("magnetized 2");
+     lastmagnet = 1;
+       magnetSwitchStateNow = digitalRead(magnetSwitch);
+
+  }
+  delay(30);
+}
+
+void rungripper() {
+ 
+    gripperSwitchState = digitalRead(gripperSwitch);
+  
+    if((lastgripper == 0) && (gripperSwitchStateNow != gripperSwitchState)) {
+    
+              servo3.write(180);
+     Serial.println("gripper open");
+     lastgripper = 1;
+         gripperSwitchStateNow = digitalRead(gripperSwitch);
+
+  }
+  else if((lastgripper == 0) && (gripperSwitchStateNow == gripperSwitchState)) {
+    
+           servo3.write(0);
+     Serial.println("gripper closed");
+     lastgripper = 0;
+         gripperSwitchStateNow = digitalRead(gripperSwitch);
+
+  }
+  else if((lastgripper == 1) && (gripperSwitchStateNow != gripperSwitchState)) {
+    
+              servo3.write(0);
+     Serial.println("gripper closed");
+     lastgripper = 0;
+         gripperSwitchStateNow = digitalRead(gripperSwitch);
+
+  }
+  else if((lastgripper == 1) && (gripperSwitchStateNow == gripperSwitchState)) {
+    
+              servo3.write(180);
+     Serial.println("gripper open");
+     lastgripper = 1;
+         gripperSwitchStateNow = digitalRead(gripperSwitch);
+
+  }
+  
+  delay(30);
+}
+
+void outputServos() {
+  
+    Serial.print ("Servo Position: ");
+    Serial.print(servoVal);
+    Serial.print (", "); 
+    Serial.println(servoVal2);
+    delay(30);
+}
+/*
+void servo1write() {
+  
+  while(((target1-servo1pos > 2)) || ((target1-servo1pos) < -2)){
+  
+  servo1pos = servo1.read();
+  Serial.print(servo1pos);
+  servo1.write((target1-servo1pos)*0.2);
+  delay(500);
+  }
+  
+}
+
+void servo2write() {
+  
+  while(((target2-servo2pos > 2)) || ((target2-servo2pos) < -2)){
+  
+  servo2pos = servo2.read();
+  Serial.print(servo2pos);
+  servo1.write((target2-servo2pos)*0.2);
+  delay(500);
+  }
+  
+}
+*/
